@@ -73,4 +73,24 @@ essa relação, sendo a categoria e N definidos pelo usuário.
 
 j. Encerrar o programa.
 
+# Requisitos de implementação:
+1. O vetor que contém os dados sobre alimentos não pode ser modificado durante a
+execução do programa.
+2. A representação das categorias de alimentos deve ser implementada por meio de
+um enumerado.
+3. A implementação da ordenação deve ser feita de forma eficiente com respeito ao
+uso de memória. Assim, por exemplo, para se obter os N alimentos com maior
+percentual de umidade, não se deve replicar todo o vetor de dados e, então,
+ordená-lo; o único dado que precisa ser replicado para proceder a ordenação é a
+própria porcentagem de umidade de cada alimento. No entanto, é preciso
+associar um ponteiro para cada valor de porcentagem de umidade, isto é, um
+ponteiro para o correspondente alimento no vetor a fim de listar os seus dados
+completos ao emitir a resposta para o usuário.
+4. Pode ser empregado qualquer algoritmo de ordenação disponível na literatura, tal
+como o Bubble Sort. Mas, é o programa deve realmente implementar o algoritmo,
+isto é, não pode simplesmente usar uma função de biblioteca que faça a
+ordenação.
+5. Não é necessário estruturar o programa em funções, mas convém que seja feito
+dessa forma a fim de facilitar o desenvolvimento do programa, bem como a sua
+compreensão.
 
