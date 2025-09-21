@@ -39,7 +39,9 @@ Os dados retornados devem ser transcritos para um arquivo texto de formato livre
 A função deve ler os dados sobre alimentos do arquivo construído na 1. Função e armazenar esses dados em memória, usando um vetor (cada elemento do vetor
 deve conter todos os dados de um alimento).
 A função deve apresentar as seguintes opções ao usuário:
+
 a. Liste todas as categorias de alimentos.
+
 b. Liste todos os alimentos de certa categoria selecionada pelo usuário,
 em ordem alfabética de acordo com a descrição do alimento.
 
