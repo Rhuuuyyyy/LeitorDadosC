@@ -1,22 +1,4 @@
-/*
- =================================================================================================
-  PROGRAMA PARA SELECIONAR 10 CATEGORIAS ALEATÓRIAS DE UM ARQUIVO JSON
- =================================================================================================
-  O que este código faz?
-  1. Lê um arquivo chamado "dados.json".
-  2. Encontra todas as "Categorias" diferentes que existem dentro dele.
-  3. Sorteia 10 dessas categorias, sem repetir nenhuma.
-  4. Mostra o resultado na tela.
 
-  COMO COMPILAR (no terminal Linux/macOS):
-  gcc seu_arquivo.c -o programa -ljson-c
-
-  ANTES DE COMPILAR, INSTALE A BIBLIOTECA json-c:
-  - Ubuntu/Debian: sudo apt-get install libjson-c-dev
-  - Fedora/Red Hat: sudo dnf install json-c-devel
-  - macOS (brew):   brew install json-c
- =================================================================================================
-*/
 #include <stdio.h>    // Para funções de entrada e saída, como printf e fopen
 #include <stdlib.h>   // Para alocação de memória (malloc), sorteio (rand, srand)
 #include <string.h>   // Para manipulação de strings, como strcmp e strcpy
