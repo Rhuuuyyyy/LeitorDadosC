@@ -1,4 +1,4 @@
-# LeitorDadosC
+# Leitor de Dados em C
 Esse repositório foi criado para o desenvolvimento do trabalho em C | Programação Imperativa.
 
 _Com base nessa tabela: https://www.cfn.org.br/wp-content/uploads/2017/03/taco_4_edicao_ampliada_e_revisada.pdf
