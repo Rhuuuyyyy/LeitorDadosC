@@ -1,5 +1,6 @@
 # Leitor de Dados em C
-Esse repositório foi criado para o desenvolvimento do trabalho em C | Programação Imperativa.
+Esse repositório foi criado para o desenvolvimento do trabalho de Programação Imperativa | PUC-PR
+A finalidade do programa consiste em ler a analisar dados para o usuário.
 
 _Com base nessa tabela: https://www.cfn.org.br/wp-content/uploads/2017/03/taco_4_edicao_ampliada_e_revisada.pdf
 (páginas 24 à 65)._
