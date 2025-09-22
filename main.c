@@ -40,5 +40,33 @@ int main() {
         printf("Analisando o conteudo do JSON...\n");
         json_object *json_completo = json_tokener_parse(buffer_json);
 
+        // // // // // // // // Função para encontrar todas as categorias únicas do arquivo de dados // // // // // // // // // 
+        printf("Analisando os dados do arquivo dados.json...")
+        char lista_categorias_unicas[100][100];
+        int lista_categorias_unicas = 0; // Função para criar uma variável que guarda o nome de 100 categorias, com até 99 letras
+
+        size_t total_itens = json_object_array_length(json_completo); // Variável para pegar o número da quantidade de itens
+
+        for (int i = 0; i < total_itens; i++) {
+            json_object *item = json_object_array_get_idx(json_completo, i); // Laço para cada item do JSON
+            json_object *valor_categoria;
+
+            json_object_object_get_ex(item, "Categoria", &valor_categoria); // Função para guardar o nome da categoria do item que está sendo lido
+            const char *nome_categoria = json_object_get_string(valor_categoria);
+
+            bool ja_existe = false. // Variável usada para definir se o nome da categoria precisa ser adicionada ou não
+
+            for (int j = 0; j < total_categorias_unicas; j++) {
+                if (strcmp(lista_categorias_unicas[j], nome_categoria) == 0) {
+                    ja_existe = true;
+                    break;
+                }
+            }
+        }
+
+            if (!ja_existe) {
+                strcpy(lista_categorias_unicas[total_categorias_unicas], nome_categoria); // Se a categoria não existe, adiciona ela à lista de categorias únicas,
+                total_categorias_unicas++;
+            }
 }
 
