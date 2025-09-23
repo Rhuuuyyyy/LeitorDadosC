@@ -4,11 +4,12 @@
 #include <time.h>     // Para funções relacionadas ao tempo
 #include <stdbool.h>  // Para usar tipos booleanos
 #include <json-c/json.h> // Biblioteca para ler JSON
+#define QUANTIDADE_A_SORTEAR 10 // Indica ao programa quantas categorias devem ser sorteadas
 
 int main() {
     bool abrir = false; // Variável para controlar se a leitura foi bem-sucedida
     int quantidade = 0; // Contador de tentativas de leitura
-
+    
     // // // // // // // // //  Função para tentar abrir o arquivo // // // // // // // // // 
     do { 
         printf("Abrindo o arquivo...\n");
@@ -20,10 +21,7 @@ int main() {
             fclose(arquivo);
         } 
     } while (quantidade < 5 && !abrir); // Tenta no máximo 5 vezes ou até conseguir abrir
-    if (!abrir) {
-        printf("Não foi possível ler o arquivo após %d tentativas.\n", quantidade);
-    }
-    
+
         // // // // // // // // Função para alocação de memória e leitura do conteúdo do arquivo // // // // // // // // // 
     if (abrir) {
         printf("Lendo o arquivo dados.json...\n");
@@ -43,7 +41,7 @@ int main() {
         // // // // // // // // Função para encontrar todas as categorias únicas do arquivo de dados // // // // // // // // // 
         printf("Analisando os dados do arquivo dados.json...")
         char lista_categorias_unicas[100][100];
-        int lista_categorias_unicas = 0; // Função para criar uma variável que guarda o nome de 100 categorias, com até 99 letras
+        int lista_categorias_unicas = 0; // Função para criar uma variável/matriz que guarda o nome de 100 categorias, com até 99 letras
 
         size_t total_itens = json_object_array_length(json_completo); // Variável para pegar o número da quantidade de itens
 
@@ -57,7 +55,7 @@ int main() {
             bool ja_existe = false. // Variável usada para definir se o nome da categoria precisa ser adicionada ou não
 
             for (int j = 0; j < total_categorias_unicas; j++) {
-                if (strcmp(lista_categorias_unicas[j], nome_categoria) == 0) {
+                if (strcmp(lista_categorias_unicas[j], nome_categoria) == 0) { // Função para analisar se a categoria já está listada ou não
                     ja_existe = true;
                     break;
                 }
@@ -68,5 +66,61 @@ int main() {
                 strcpy(lista_categorias_unicas[total_categorias_unicas], nome_categoria); // Se a categoria não existe, adiciona ela à lista de categorias únicas,
                 total_categorias_unicas++;
             }
+
+        printf("Foram encontradas %d categorias unicas.\n\n", total_categorias_unicas); // Função que mostra quantas categorias tem no total
+
+        if (total_categorias_unicas < QUANTIDADE_A_SORTEAR) {
+            printf("Nao ha categorias suficientes para sortear: %d...\n", QUANTIDADE_A_SORTEAR); // Função para analisar se o total de categorias é menor que o suficiente
+            return 1;
+        }
+
+        printf("Sorteando %d Categorias...\n", QUANTIDADE_A_SORTEAR); // O %d é utilizado para mostrar números inteiros
+
+        srand(time(NULL)); // Função para que cada vez que o programa for executado, time(NULL) fornecerá um valor diferente, resultando em uma sequência de números pseudoaleatórios distinta a cada execução. 
+
+        char *categorias_sorteadas[QUANTIDADE_A_SORTEAR]; // Variável que vai guardar quais categorias foram sorteadas
+        int indices_ja_sorteados[QUANTIDADE_A_SORTEAR]; // Variável que vai definir se o índice sorteado já não foi sorteado antes
+
+            for (int i = 0; i < QUANTIDADE_A_SORTEAR; i++) { // Laço para iniciar a análise das categorias para o sorteio
+                int indice_sorteado; // Variável para indicar qual está sendo analisado
+                bool eh_novo; // Variável para definir se foi um índice já sorteado ou não
+
+                do { // Loop que vai garantir que o índice sorteado seja novo
+                    eh_novo = true;
+                    indice_sorteado = rand() % total_categorias_unicas; // Função para sortear um índice entre 0 e total_categorias_unicas
+
+                    for (int j = 0; j < i; j++) {
+                        if (indices_ja_sorteados[j] == indice_sorteado) {
+                            eh_novo = false; // // Verifica se este índice já foi sorteado antes
+                            break; // Se já foi sorteado antes, a repetição quebra
+                        }
+                    }
+                } while (!eh_novo); // Continua sorteando até encontrar um índice novo
+
+                indices_ja_sorteados[i] = indice_sorteado; // Variável para guardar os índices que já foram sorteados
+                categorias_sorteadas[i] = lista_categorias_unicas[indice_sorteado]; // Variável importante para anotar quais foram os índices sorteados
+            }
+
+            for (int i = 0; i < QUANTIDADE_A_SORTEAR; i++) {
+                printf("%d: %s\n", i + 1, categorias_sorteadas[i]); // Função para fazer um print das categorias sorteadas
+            }
+            
+
+
+        O RESTANTE DO CÓDIGO DEVE SER ESCRITO AQUI...
+        "categorias_sorteadas[]" é a lista onde está registrada quais foram as 10 categorias sorteadas.
+        O código deve ser escrito encima disso...
+
+
+
+    // // // // // // // // //  Função para interromper o programa caso o arquivo não seja lido // // // // // // // // // 
+    } else {
+        printf("Não foi possível ler o arquivo após %d tentativas.\n", quantidade);
+        return 1;
+    }
+            // ------------------------ IMPORTANTE ! Função para liberar a memória utilizada ------------------------
+    json_object_put(json_completo);
+    free(buffer_json);
+    return 0; 
 }
 
