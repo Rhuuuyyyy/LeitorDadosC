@@ -97,7 +97,7 @@ char** sortear() {
     // Esta memória não será destruída quando a função terminar.
     char **categorias_sorteadas = malloc(QUANTIDADE_A_SORTEAR * sizeof(char*));
     if (categorias_sorteadas == NULL) {
-        json_object_put(json_completo); // Função que serve para retornar um erro crítico caso tenha falhas na alocação de memórias
+        json_object_put(json_completo); // Função que serve para limpar a memória caso a função não funcione
         free(buffer_json);
         return NULL;
     }
@@ -122,8 +122,8 @@ char** sortear() {
 
         indices_ja_sorteados[i] = indice_sorteado; // Variável para guardar os índices que já foram sorteados
         
-        categorias_sorteadas[i] = strdup(lista_categorias_unicas[indice_sorteado]); /* Copia o conteúo do categorias_sorteadas
-         para uma nova variável que vai permanecer na memória mesmo após a função terminar, por meio da memória dinâmica (HEAP)*/
+        categorias_sorteadas[i] = strdup(lista_categorias_unicas[indice_sorteado]); /* Copia o conteúdo de 'lista_categorias_unicas[indice_sorteado]'
+   para uma nova área de memória na HEAP (memória dinâmica), e armazena o endereço dessa cópia em 'categorias_sorteadas[i]'.*/
     }
 
     json_object_put(json_completo); // Libera a memória que foi usada apenas DENTRO desta função
@@ -137,21 +137,27 @@ int main() {
     // Chama a função e armazena o ponteiro para o array de resultados
     char **resultado_sorteio = sortear();
 
-    // [NOVO] É CRUCIAL verificar se o ponteiro é NULL. Se for, significa que ocorreu um erro.
+    // Verifica se o ponteiro é NULL. Se for, significa que ocorreu um erro.
     if (resultado_sorteio != NULL) {
         printf("\n--- Categorias Sorteadas (impresso pela funcao main) ---\n");
         for (int i = 0; i < QUANTIDADE_A_SORTEAR; i++) {
             printf("%d: %s\n", i + 1, resultado_sorteio[i]);
         }
+
+
+
+        AS CHAMADAS DAS FUNÇÕES QUE O USUÁRIO PODE ESCOLHER, DEVEM ESTAR AQUI...
+
+
         
         // ------------------------ IMPORTANTE ! Função para liberar a memória utilizada ------------------------
-        // [NOVO] Como a memória foi alocada por sortear(), 'main' é agora responsável por liberá-la.
+        // Como a memória foi alocada por sortear(), 'main' é agora responsável por liberá-la.
         printf("\nLiberando memoria alocada...\n");
         for (int i = 0; i < QUANTIDADE_A_SORTEAR; i++) {
             free(resultado_sorteio[i]); // Primeiro, libera cada string individual que foi criada com strdup()
         }
         free(resultado_sorteio); // Depois, libera o array de ponteiros que foi criado com malloc()
-        printf("Memoria liberada com sucesso.\n");
+        printf("Memoria liberada com sucesso...\n");
 
     } else {
         printf("\nOcorreu um erro durante o processo de sorteio...\n");
