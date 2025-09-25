@@ -104,18 +104,26 @@ char** sortear() {
 
     int indices_ja_sorteados[QUANTIDADE_A_SORTEAR]; // Variável que vai definir se o índice sorteado já não foi sorteado antes
 
-    for (int i = 0; i < QUANTIDADE_A_SORTEAR; i++) { // Laço para iniciar a análise das categorias para o sorteio
+    for (int i = 0; i < QUANTIDADE_A_SORTEAR; i++) { // Laço para iniciar a análise e sortear 10 categorias
+
+/* Esse laço vai fazer o seguinte:
+    Analisar a 1° categoria > Decidir se vai ser sorteada ou não > Analisar se essa categoria já foi sorteada antes 
+    Analisar a 2° categoria > Decidir se vai ser sorteada ou não > Analisar se essa categoria já foi sorteada antes
+    etc... 
+    Até chegar em 10 categorias sorteadas. 
+*/
+
         int indice_sorteado; // Variável para indicar qual está sendo analisado
         bool eh_novo; // Variável para definir se foi um índice já sorteado ou não
 
         do { // Loop que vai garantir que o índice sorteado seja novo
             eh_novo = true;
-            indice_sorteado = rand() % total_categorias_unicas; // Função para sortear um índice entre 0 e total_categorias_unicas
+            indice_sorteado = rand() % total_categorias_unicas; // Função para sortear um índice entre 1 e 10
 
             for (int j = 0; j < i; j++) {
                 if (indices_ja_sorteados[j] == indice_sorteado) {
                     eh_novo = false; // Verifica se este índice já foi sorteado antes
-                    break; // Se já foi sorteado antes, a repetição quebra
+                    break; // Se já foi sorteado antes, a repetição quebra e o laço começa a analisar uma nova categoria
                 }
             }
         } while (!eh_novo); // Continua sorteando até encontrar um índice novo
@@ -123,21 +131,29 @@ char** sortear() {
         indices_ja_sorteados[i] = indice_sorteado; // Variável para guardar os índices que já foram sorteados
         
         categorias_sorteadas[i] = strdup(lista_categorias_unicas[indice_sorteado]); /* Copia o conteúdo de 'lista_categorias_unicas[indice_sorteado]'
-   para uma nova área de memória na HEAP (memória dinâmica), e armazena o endereço dessa cópia em 'categorias_sorteadas[i]'.*/
+   para uma nova área de memória na HEAP (memória dinâmica), e armazena o endereço dessa cópia em 'categorias_sorteadas[i]'.
+
+   EXPLICAÇÃO: Toda a memória utilizada na função vai ser descartada assim que a função acabar, logo, quando essa função
+   acabar, toda a lista de categorias sorteadas vão ser deletadas. Então, essa função copia a lista de categorias sorteadas
+   para uma variável fora da função, para que quando a função acabe, a lista de categorias sorteadas continuará existindo
+   na memória.
+   */
+
     }
 
-    json_object_put(json_completo); // Libera a memória que foi usada apenas DENTRO desta função
-    free(buffer_json);
+    json_object_put(json_completo); // Seleciona o json que estamos analisando
+    free(buffer_json); // Libera a memória utilizada pelo json que selecionamos na linha acima
 
     return categorias_sorteadas; // Retorna o ponteiro para o array alocado dinamicamente.
 }
 
 // // // // // // // // //  Função Principal: Orquestra o sorteio e gerencia a memória // // // // // // // // // 
+
 int main() {
-    // Chama a função e armazena o ponteiro para o array de resultados
+    // Chama a função e armazena o ponteiro (localização da memória onde está os resultados) para o array de resultados
     char **resultado_sorteio = sortear();
 
-    // Verifica se o ponteiro é NULL. Se for, significa que ocorreu um erro.
+    // Verifica se o ponteiro (localização da memória onde está os resultados) é NULL. Se for, significa que ocorreu um erro.
     if (resultado_sorteio != NULL) {
         printf("\n--- Categorias Sorteadas (impresso pela funcao main) ---\n");
         for (int i = 0; i < QUANTIDADE_A_SORTEAR; i++) {
