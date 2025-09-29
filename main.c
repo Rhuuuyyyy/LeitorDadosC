@@ -5,28 +5,13 @@
 #include <stdbool.h>
 #include <json-c/json.h>
 
+#include "funcoes_usuario.h"
+
 #define TOTAL_ALIMENTOS_A_SORTEAR 100
 #define MIN_CATEGORIAS_A_USAR 10
 #define MIN_ALIMENTOS_POR_CATEGORIA 5
 #define MAX_ALIMENTOS_POR_CATEGORIA 20
 #define ARQUIVO_SAIDA "alimentos_selecionados.csv" // Esse será o arquivo que o código irá gerar assim que o sorteio dos dados acontecer.
-
-typedef struct { // Isso cria uma estrutura de dados pré-definida para utilizarmos durante o código.
-    int numero;
-    char* descricao;
-    double umidade;
-    int energia_kcal;
-    double proteina;
-    double carboidrato;
-    char* categoria;
-} Alimento; // A estrutura se chama "Alimento", para que possamos utilizá-la de maneira mais prática, ao invés de sempre repetir toda a estrutura.
-
-// Enum para representar as categorias, conforme requisito do trabalho
-typedef enum { // O enum serve para atribuir números inteiros aos atributos que adicionamos, ou seja: CEREAIS = 0, VERDURAS = 1, FRUTAS = 2, etc... Dessa forma, será mais fácil para o processador sortear e comparar.
-    CEREAIS, VERDURAS, FRUTAS, GORDURAS, PESCADOS, CARNES, LEITE,
-    BEBIDAS, OVOS, ACUCARADOS, MISCELANEAS, INDUSTRIALIZADOS,
-    PREPARADOS, LEGUMINOSAS, NOZES, CATEGORIA_INVALIDA
-} TipoCategoria;
 
 
                         // AQUI FICAM OS PROTÓTIPOS DAS FUNÇÕES... //
@@ -45,9 +30,7 @@ void escrever_alimentos_em_csv(Alimento** alimentos_selecionados, int total); //
 
 // Funções da Fase 2
 Alimento** ler_alimentos_do_csv(const char* nome_arquivo, int* total_alimentos); // Irá retornar os ponteiros de uma nova ficha dos 100 alimentos que estarão presentes no arquivo csv...
-void exibir_menu(); // Função que vai exibir os prints das opções do menu para o usuário...
-void processar_opcao(char opcao, Alimento** alimentos, int total); // Função que vai guardar a opção do usuário, e chamar a função de sua respectiva escolha...
-void listar_categorias_unicas(Alimento** alimentos, int total); // Função para imprimir na tela todas as categorias sem repetições...
+// Os protótipos de exibir_menu, processar_opcao e listar_categorias_unicas foram para funcoes_usuario.h
 
 // Função utilitária
 void liberar_memoria_alimentos(Alimento** alimentos, int total); // Essa função vai liberar a memória utilizada...
@@ -99,7 +82,7 @@ int main() {
         fprintf(stderr, "Erro ao ler o arquivo CSV. Encerrando...\n");
         return 1;
     }
-    printf("Sucesso! %d alimentos foram carregados do CSV para analise.\n");
+    printf("Sucesso! %d alimentos foram carregados do CSV para analise.\n", total_alimentos_csv);
 
     // ===================================================================================
     // MOSTRAR MENU DE INTERAÇÃO 
@@ -119,94 +102,6 @@ int main() {
     return 0;
 }
 
-// ===================================================================================
-// FUNÇÃO PARA EXIBIR O MENU DE OPÇÕES DO USUÁRIO
-// ===================================================================================
-void exibir_menu() {
-    // Esta função tem um trabalho simples: apenas imprimir o menu de opções na tela
-    // para que o usuário saiba quais letras digitar para cada ação.
-
-
-
-
-
-        DEVE SER COMPLETO AQUI...
-
-
-
-
-
-
-
-
-
-}
-
-// ===================================================================================
-// FUNÇÃO PARA PROCESSAR A OPÇÃO ESCOLHIDA PELO USUÁRIO
-// ===================================================================================
-void processar_opcao(char opcao, Alimento** alimentos, int total) {
-    switch (opcao) {
-        case 'a': case 'A':
-            // Se o usuário digitou 'a' ou 'A', chama a função que lista as categorias.
-            listar_categorias_unicas(alimentos, total);
-            break;
-        case 'b': case 'B':
-        case 'c': case 'C':
-        case 'd': case 'D':
-        case 'e': case 'E':                  DEVE SER COMPLETO AQUI...
-        case 'f': case 'F':
-        case 'g': case 'G':
-        case 'h': case 'H':
-        case 'i': case 'I':
-            // Para as outras opções, por enquanto, apenas exibimos uma mensagem.
-            printf("\nOpcao ainda nao implementada.\n");
-            break;
-        case 'j': case 'J':
-            // Se o usuário digitou 'j' ou 'J', apenas mostra uma mensagem de despedida.
-            // O programa vai terminar por causa da condição no loop 'do-while' da main.
-            printf("\nEncerrando...\n");
-            break;
-        default:
-            // Se o usuário digitar qualquer outra letra, avisa que a opção é inválida.
-            printf("\nOpcao invalida! Por favor, tente novamente.\n");
-            break;
-    }
-}
-
-// ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'a')
-// ===================================================================================
-void listar_categorias_unicas(Alimento** alimentos, int total) {
-    // O objetivo desta função é olhar os 100 alimentos e dizer quais são as categorias presentes, sem repetir nenhuma.
-    char lista_unicas[50][100]; // Cria uma matriz para guardar até 50 categorias, cada uma com até 100 caracteres.
-    int total_unicas = 0;       // Um contador para saber quantas categorias já anotou.
-
-    // Percorre a lista de todos os 100 alimentos, um por um.
-    for (int i = 0; i < total; i++) {
-        bool ja_existe = false; // Começa assumindo que a categoria do alimento atual é nova.
-        
-        // Olha a matriz para ver se a categoria atual já foi anotada antes.
-        for (int j = 0; j < total_unicas; j++) {
-            if (strcmp(lista_unicas[j], alimentos[i]->categoria) == 0) { // O strcmp compara duas strings. Se forem iguais, retorna 0. 
-                ja_existe = true; // Se encontrou, marca que ela já existe.
-                break;            // E para de procurar.
-            }
-        }
-        
-        // Se, depois de procurar, viu que a categoria realmente era nova...
-        if (!ja_existe) {
-            strcpy(lista_unicas[total_unicas], alimentos[i]->categoria); // ...anota o nome da categoria na "folha de papel".
-            total_unicas++; // E aumenta o contador de categorias anotadas.
-        }
-    }
-
-    // No final, imprime a lista final de categorias que foi anotada.
-    printf("\n--- Categorias Disponiveis para Analise ---\n");
-    for (int i = 0; i < total_unicas; i++) {
-        printf("- %s\n", lista_unicas[i]);
-    }
-}
 
 // ===================================================================================
 // FUNÇÃO PARA LER OS DADOS DO ARQUIVO .CSV
