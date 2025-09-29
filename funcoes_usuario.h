@@ -1,4 +1,4 @@
-#ifndef FUNCOES_USUARIO_H
+#ifndef FUNCOES_USUARIO_H // Isso cria um "guarda cabeçalho" para que o compilador não tenha que ler esse arquivo mais de uma vez...
 #define FUNCOES_USUARIO_H
 
 #include <stdbool.h>
