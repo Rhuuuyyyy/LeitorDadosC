@@ -267,18 +267,24 @@ Alimento** ler_alimentos_do_json(const char* nome_arquivo, int* total_alimentos)
 // FUNÇÃO PARA LIBERAR A MEMÓRIA (A "EQUIPE DE LIMPEZA")
 // ===================================================================================
 void liberar_memoria_alimentos(Alimento** alimentos, int total) {
-    // Esta função é a "equipe de limpeza". Ela é chamada no final para garantir que toda a memória
+    // Esta função serve para a limpeza de memória. Ela é chamada no final para garantir que toda a memória
     // que pegamos "emprestada" do computador seja devolvida.
     if (alimentos == NULL) return; // Se a lista já estiver vazia, não faz nada.
 
     // Percorre a lista de alimentos...
     for (int i = 0; i < total; i++) {
         if (alimentos[i] != NULL) {
-            // Para cada alimento, devolve a memória usada para guardar a descrição e a categoria.
             free(alimentos[i]->descricao);
             free(alimentos[i]->categoria);
-            // Depois, devolve a memória da "ficha de alimento" em si.
             free(alimentos[i]);
+            /* 
+            EXPLICAÇÃO DO QUE ESSE CÓDIGO FAZ:
+            O "free" serve para liberar a memória alocada.
+            Primeiro ele libera o "descricao" e "categoria", para que assim, depois seja liberado o "alimentos" inteiro em si,
+            porque a descricao e a categoria são elementos do alimento, então, se eu liberar o alimento inteiro,
+            não haverá mais uma referência para chegar em descricao e categoria dele, e a memória dos dois ficarão
+            paradas, gerando um memory leak (vazamento de memória)...
+            */
         }
     }
     // No final, devolve a memória usada para a "agenda de endereços".
