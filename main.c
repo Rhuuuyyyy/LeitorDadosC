@@ -207,10 +207,11 @@ Alimento** sortear_100_alimentos(Alimento** todos_alimentos, int total_alimentos
 // ===================================================================================
 // FUNÇÃO PARA ESCREVER OS DADOS EM UM ARQUIVO .CSV
 // ===================================================================================
+
 void escrever_alimentos_em_csv(Alimento** alimentos_selecionados, int total) {
     // Esta função pega a lista dos 100 alimentos sorteados e a escreve em um arquivo de texto.
     FILE* arquivo = fopen(ARQUIVO_SAIDA, "w"); // Abre um arquivo em branco para escrita.
-    if (arquivo == NULL) { perror("Nao foi possivel criar o arquivo de saida"); return; }
+    if (arquivo == NULL) { perror("Nao foi possivel criar o arquivo de saida..."); return; }
     
     // Escreve a primeira linha, o cabeçalho, no arquivo.
     fprintf(arquivo, "Numero;Descricao;Umidade;Energia_kcal;Proteina;Carboidrato;Categoria\n");
@@ -229,14 +230,24 @@ void escrever_alimentos_em_csv(Alimento** alimentos_selecionados, int total) {
 // ===================================================================================
 Alimento** ler_alimentos_do_json(const char* nome_arquivo, int* total_alimentos) {
     // Esta função é uma especialista em ler o arquivo .json, que tem uma estrutura mais complexa.
-    FILE* arquivo = fopen(nome_arquivo, "r");
+    FILE* arquivo = fopen(nome_arquivo, "r"); // O "r" serve para indicar que o arquivo vai ser apenas lido...
     if (arquivo == NULL) { perror("Nao foi possivel abrir o arquivo dados.json"); return NULL; }
     
     // Lê o conteúdo inteiro do arquivo para a memória de uma só vez.
-    fseek(arquivo, 0, SEEK_END); long tamanho = ftell(arquivo); fseek(arquivo, 0, SEEK_SET);
+    fseek(arquivo, 0, SEEK_END); long tamanho = ftell(arquivo); fseek(arquivo, 0, SEEK_SET); 
+    /* "fseek" é um ponteiro de posição, ou seja, se o ponteiro está no final do arquivo, o elemento lido
+    vai ser o mesmo que está no final do arquivo.
+    O "fseek(arquivo, 0, SEEK_END): Joga o ponteiro de posição para o final do arquivo...
+    O long tamanho = ftell(arquivo): Diz quantos bytes foram percorridos, fazendo com que a variável
+    guarde o tamanho do arquivo...
+    O "fseek(arquivo, 0, SEEK_SET): Faz o ponteiro de posição voltar para o início do arquivo..." */
     char* buffer_json = (char*)malloc(tamanho + 1);
-    if (buffer_json == NULL) { fprintf(stderr, "Falha ao alocar memoria para o buffer do JSON.\n"); fclose(arquivo); return NULL; }
+    // Essa linha faz com que o "malloc" aloque a memória necessária (quantidade exata de bytes do arquivo lido + 1 para o \0)...
+    if (buffer_json == NULL) { fprintf(stderr, "Falha ao alocar memoria para o buffer do JSON...\n"); fclose(arquivo); return NULL; }
+    // Se nõa tiver memória o suficiente para alocar, o sistema retorna um erro..
     fread(buffer_json, 1, tamanho, arquivo); fclose(arquivo); buffer_json[tamanho] = '\0';
+    // fread = file read: Lê as informações do arquivo e aloca efetivamente na memória...
+    // o buffer_json[tamanho] = '\0' adiciona o \0 no final da memória para indicar o fim de uma string...
     
     // Usa a biblioteca 'json-c' para interpretar o texto do arquivo e transformá-lo em objetos que o C entende.
     json_object* json_completo = json_tokener_parse(buffer_json);
