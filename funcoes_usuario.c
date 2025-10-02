@@ -59,16 +59,62 @@ A inclusão de cabeçalhos permite a compilação separada, enquanto a ligação
 as referências entre os módulos de código compilados.
 */
 
+// --- Funções Auxiliares para o Quick Sort ---
+
+// Função para trocar dois ponteiros de Alimento de lugar
+void trocar_ponteiros(Alimento** a, Alimento** b) {
+    Alimento* temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Funções de comparação para o Quick Sort
+int comparar_por_descricao(const void* a, const void* b) {
+    Alimento* alim_a = *(Alimento**)a;
+    Alimento* alim_b = *(Alimento**)b;
+    return strcmp(alim_a->descricao, alim_b->descricao);
+}
+
+int comparar_por_energia(const void* a, const void* b) {
+    Alimento* alim_a = *(Alimento**)a;
+    Alimento* alim_b = *(Alimento**)b;
+    // Retorna > 0 se b for maior, 0 se igual, < 0 se a for maior (para ordem decrescente)
+    return alim_b->energia_kcal - alim_a->energia_kcal;
+}
+
+// Partição do Quick Sort: rearranja o array
+int particao(Alimento** arr, int baixo, int alto, int (*comparar)(const void*, const void*)) {
+    Alimento* pivo = arr[alto];
+    int i = (baixo - 1);
+
+    for (int j = baixo; j <= alto - 1; j++) {
+        if (comparar(&arr[j], &pivo) < 0) {
+            i++;
+            trocar_ponteiros(&arr[i], &arr[j]);
+        }
+    }
+    trocar_ponteiros(&arr[i + 1], &arr[alto]);
+    return (i + 1);
+}
+
+// Implementação manual do Quick Sort, conforme requisito do trabalho
+void quick_sort(Alimento** arr, int baixo, int alto, int (*comparar)(const void*, const void*)) {
+    if (baixo < alto) {
+        int pi = particao(arr, baixo, alto, comparar);
+        quick_sort(arr, baixo, pi - 1, comparar);
+        quick_sort(arr, pi + 1, alto, comparar);
+    }
+}
+
 // ===================================================================================
 // FUNÇÃO PARA EXIBIR O MENU DE OPÇÕES DO USUÁRIO
 // ===================================================================================
 void exibir_menu() {
-    
 
 
 
-    AQUI DEVE SER FEITO OS PRINTs DAS OPÇÕES PARA O USUÁRIO
 
+    AQUI DEVE SER FEITO OS PRINTS DO MENU PARA O USUÁRIO...
 
 
 
@@ -79,13 +125,20 @@ void exibir_menu() {
 // FUNÇÃO PARA PROCESSAR A OPÇÃO ESCOLHIDA PELO USUÁRIO
 // ===================================================================================
 void processar_opcao(char opcao, Alimento** alimentos, int total) {
+
     switch (opcao) {
         case 'a': case 'A':
-            // Se o usuário digitou 'a' ou 'A', chama a função que lista as categorias.
             listar_categorias_unicas(alimentos, total);
             break;
+
         case 'b': case 'B':
+            listar_alimentos_por_categoria_alfa(alimentos, total);
+            break;
+
         case 'c': case 'C':
+            listar_alimentos_por_categoria_energia(alimentos, total);
+            break;
+            
         case 'd': case 'D':
         case 'e': case 'E':
         case 'f': case 'F':
@@ -140,4 +193,118 @@ void listar_categorias_unicas(Alimento** alimentos, int total) {
         printf("- %s\n", lista_unicas[i]); // Laço para dar print em cada um dos elementos da lista de categorias únicas...
     }
 }
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'b')
+// ===================================================================================
+
+void listar_alimentos_por_categoria_alfa(Alimento** alimentos, int total) {
+    char categoria_escolhida[100];
+
+    // Passo 1: Mostrar as categorias disponível e pedir para o usuário escolher uma.
+    printf("\n--- Lista dos Alimentos em Ordem Alfabetica ---\n");
+    listar_categorias_unicas(alimentos, total); // Reutilizamos a função da 'a' para mostrar as opções
+
+    printf("\n> Digite o nome (exatamente igual) de uma das categorias acima: ");
+    
+    scanf(" %[^\n]", categoria_escolhida);
+
+    // Passo 2: Filtrar os alimentos que pertencem à categoria escolhida.
+    // E criar um vetor que guardara os ponteiros para os alimentos originais.(Assim como na 'a')
+    Alimento* alimentos_filtrados[100]; 
+    int total_filtrados = 0;
+
+    for (int i = 0; i < total; i++) {
+        // Compara se a categoria do alimento atual é igual a categoria escolhida.
+        if (strcmp(alimentos[i]->categoria, categoria_escolhida) == 0) {
+            alimentos_filtrados[total_filtrados] = alimentos[i]; // Adiciona o ponteiro ao nosso vetor.
+            total_filtrados++;
+        }
+    }
+
+    // Se nenhum alimento for encontrado, informa o usuário e encerra a função.
+    if (total_filtrados == 0) {
+        printf("\nNenhum alimento encontrado para a categoria \"%s\". Verifique se o nome foi digitado corretamente.\n", categoria_escolhida);
+        return;
+    }
+    
+    // A ideia dessa parte é usar o Quick Sort, um algoritmo eficiente que escolhe
+    // um elemento como "pivô" e particiona a lista, colocando elementos menores
+    // de um lado e maiores do outro, e então repete o processo recursivamente.
+    quick_sort(alimentos_filtrados, 0, total_filtrados - 1, comparar_por_descricao);
+
+    // Passo 4: Exibi os resultados já ordenados.
+    printf("\n--- Alimentos na categoria '%s' ---\n", categoria_escolhida);
+    for (int i = 0; i < total_filtrados; i++) {
+        printf("  - %s (No %d)\n", alimentos_filtrados[i]->descricao, alimentos_filtrados[i]->numero);
+    }
+}
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'c')
+// ===================================================================================
+
+void listar_alimentos_por_categoria_energia(Alimento** alimentos, int total) {
+    char categoria_escolhida[100];
+
+    // Passo 1: Interação com o usuário (Mesma estrutura da B)
+    printf("\n--- Listar Alimentos por Categoria (Ordem Decrescente de Energia) ---\n");
+    listar_categorias_unicas(alimentos, total);
+    // Função da 'a' para nós ajudar
+    printf("\n> Digite o nome exato de uma das categorias acima: ");
+    
+    scanf(" %[^\n]", categoria_escolhida);
+
+    // Passo 2: Filtragem dos alimentos (Mesma estrutura da B)
+    Alimento* alimentos_filtrados[100];
+    int total_filtrados = 0;
+
+    for (int i = 0; i < total; i++) {
+        if (strcmp(alimentos[i]->categoria, categoria_escolhida) == 0) {
+            alimentos_filtrados[total_filtrados++] = alimentos[i];
+        }
+    }
+
+    if (total_filtrados == 0) {
+        printf("\nNenhum alimento encontrado para a categoria \"%s\". Verifique se o nome foi digitado corretamente.\n", categoria_escolhida);
+        return;
+    }
+
+    // Passo 3: Ordenação por energia
+    // Usaremos Quick Sort novamente, mas agora o critério de comparação é a energia, em ordem decrescente.
+    quick_sort(alimentos_filtrados, 0, total_filtrados - 1, comparar_por_energia);
+
+
+    // Passo 4: Exibi os resultados
+    printf("\n--- Alimentos na categoria '%s' (Ordem Decrescente de Energia) ---\n", categoria_escolhida);
+    for (int i = 0; i < total_filtrados; i++) {
+        printf("  - %s | Energia: %d Kcal\n",
+               alimentos_filtrados[i]->descricao,
+               alimentos_filtrados[i]->energia_kcal);
+    }
+}
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'd')
+// ===================================================================================
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'e')
+// ===================================================================================
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'f')
+// ===================================================================================
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'g')
+// ===================================================================================
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'h')
+// ===================================================================================
+
+// ===================================================================================
+// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'i')
+// ===================================================================================
 

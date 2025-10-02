@@ -30,7 +30,6 @@ void escrever_alimentos_em_csv(Alimento** alimentos_selecionados, int total); //
 
 // Funções da Fase 2
 Alimento** ler_alimentos_do_csv(const char* nome_arquivo, int* total_alimentos); // Irá retornar os ponteiros de uma nova ficha dos 100 alimentos que estarão presentes no arquivo csv...
-// Os protótipos de exibir_menu, processar_opcao e listar_categorias_unicas foram para funcoes_usuario.h
 
 // Função utilitária
 void liberar_memoria_alimentos(Alimento** alimentos, int total); // Essa função vai liberar a memória utilizada...
@@ -204,6 +203,8 @@ Alimento** sortear_100_alimentos(Alimento** todos_alimentos, int total_alimentos
     return alimentos_sorteados; // Retorna a lista final com os 100 alimentos.
 }
 
+
+
 // ===================================================================================
 // FUNÇÃO PARA ESCREVER OS DADOS EM UM ARQUIVO .CSV
 // ===================================================================================
@@ -250,24 +251,43 @@ Alimento** ler_alimentos_do_json(const char* nome_arquivo, int* total_alimentos)
     // o buffer_json[tamanho] = '\0' adiciona o \0 no final da memória para indicar o fim de uma string...
     
     // Usa a biblioteca 'json-c' para interpretar o texto do arquivo e transformá-lo em objetos que o C entende.
-    json_object* json_completo = json_tokener_parse(buffer_json);
+    json_object* json_completo = json_tokener_parse(buffer_json); /* O "tokener" seleciona o "buffer_json" que é um texto simples, e quebra em tokens lógicos,
+     e o "parse" interpreta e analisa para entender a composição hierárquica do texto...*/
     if (json_completo == NULL) { fprintf(stderr, "Erro ao interpretar o conteudo JSON.\n"); free(buffer_json); return NULL; }
     
     size_t n_alimentos = json_object_array_length(json_completo); *total_alimentos = n_alimentos;
-    Alimento** array_alimentos = (Alimento**)malloc(n_alimentos * sizeof(Alimento*));
+    /* O "n_alimentos" é um size_t, que é um tipo de variável que guarda o tamanho de algo na memória .O "json_completo" é o arquivo "dados.json" 
+    já lido e interpretado, e sabemos que o objeto é um array.
+    O "json_object_array_lenght()" serve para contar quantos
+    elementos o array, que é um json, possui.*/
+    Alimento** array_alimentos = (Alimento**)malloc(n_alimentos * sizeof(Alimento*)); /* Aqui a função pega o tamanho de um alimento,
+    e aloca uma memória do tamanho da quantidade de alimentos x tamanho de cada alimento...*/
     if (array_alimentos == NULL) { fprintf(stderr, "Falha ao alocar memoria para o array de alimentos.\n"); free(buffer_json); json_object_put(json_completo); return NULL; }
     
     // Percorre cada objeto de alimento no JSON...
     for (int i = 0; i < n_alimentos; i++) {
-        json_object* item = json_object_array_get_idx(json_completo, i);
-        array_alimentos[i] = (Alimento*)malloc(sizeof(Alimento)); // Cria uma "ficha de alimento" na memória.
+        json_object* item = json_object_array_get_idx(json_completo, i); /* "json_completo" é o vetor onde está os alimentos. o "json_object_array_get_idx" seleciona
+        o alimento que está na posição "i" */
+        array_alimentos[i] = (Alimento*)malloc(sizeof(Alimento)); // Aloca uma memória do tamanho do item para o alimento.
         
         // Pega cada dado do objeto JSON (Numero, Descricao, etc.)...
         json_object *j_numero, *j_descricao, *j_umidade, *j_energia, *j_proteina, *j_carboidrato, *j_categoria;
-        json_object_object_get_ex(item, "Numero", &j_numero); json_object_object_get_ex(item, "Descricao", &j_descricao); json_object_object_get_ex(item, "Umidade", &j_umidade); json_object_object_get_ex(item, "Energia_kcal", &j_energia); json_object_object_get_ex(item, "Proteina", &j_proteina); json_object_object_get_ex(item, "Carboidrato", &j_carboidrato); json_object_object_get_ex(item, "Categoria", &j_categoria);
+        json_object_object_get_ex(item, "Numero", &j_numero); 
+        json_object_object_get_ex(item, "Descricao", &j_descricao); 
+        json_object_object_get_ex(item, "Umidade", &j_umidade); 
+        json_object_object_get_ex(item, "Energia_kcal", &j_energia); 
+        json_object_object_get_ex(item, "Proteina", &j_proteina); 
+        json_object_object_get_ex(item, "Carboidrato", &j_carboidrato); 
+        json_object_object_get_ex(item, "Categoria", &j_categoria);
         
         // ...e preenche a "ficha de alimento" com esses dados.
-        array_alimentos[i]->numero = json_object_get_int(j_numero); array_alimentos[i]->descricao = strdup(json_object_get_string(j_descricao)); array_alimentos[i]->umidade = json_object_get_double(j_umidade); array_alimentos[i]->energia_kcal = json_object_get_int(j_energia); array_alimentos[i]->proteina = json_object_get_double(j_proteina); array_alimentos[i]->carboidrato = json_object_get_double(j_carboidrato); array_alimentos[i]->categoria = strdup(json_object_get_string(j_categoria));
+        array_alimentos[i]->numero = json_object_get_int(j_numero); 
+        array_alimentos[i]->descricao = strdup(json_object_get_string(j_descricao)); 
+        array_alimentos[i]->umidade = json_object_get_double(j_umidade); 
+        array_alimentos[i]->energia_kcal = json_object_get_int(j_energia); 
+        array_alimentos[i]->proteina = json_object_get_double(j_proteina); 
+        array_alimentos[i]->carboidrato = json_object_get_double(j_carboidrato); 
+        array_alimentos[i]->categoria = strdup(json_object_get_string(j_categoria));
     }
     
     json_object_put(json_completo); free(buffer_json); // Libera a memória usada pela leitura do JSON.
