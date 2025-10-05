@@ -134,20 +134,12 @@ int particao(Alimento** arr, int baixo, int alto, int (*comparar)(const void*, c
     int i = (baixo - 1);
 
     for (int j = baixo; j <= alto - 1; j++) {
-        // A lógica de comparação aqui depende do que a função 'comparar' retorna.
-        // Para ordem alfabética (ascendente), usamos '< 0'.
-        // Para as demais (decrescentes), usamos '> 0'.
-        // Como 'b' é a única ascendente, tratamos ela como um caso especial.
-        if (comparar == comparar_por_descricao) {
-            if (comparar(&arr[j], &arr[alto]) < 0) {
-                i++;
-                trocar_ponteiros(&arr[i], &arr[j]);
-            }
-        } else {
-            if (comparar(&arr[j], &arr[alto]) > 0) {
-                i++;
-                trocar_ponteiros(&arr[i], &arr[j]);
-            }
+ 
+        // Se a função 'comparar' retornar um valor negativo, significa que 'arr[j]'
+        // deve vir ANTES do pivô na lista final.
+        if (comparar(&arr[j], &pivo) < 0) {
+            i++;
+            trocar_ponteiros(&arr[i], &arr[j]);
         }
     }
     trocar_ponteiros(&arr[i + 1], &arr[alto]);

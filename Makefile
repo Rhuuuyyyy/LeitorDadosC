@@ -8,7 +8,7 @@ CFLAGS = -Wall -g
 
 # Flags do linker:
 # -ljson-c: Informa ao linker para incluir a biblioteca "json-c".
-LDFLAGS = -ljson-c
+LDFLAGS = -static -ljson-c
 
 # Nome do arquivo executável que será gerado
 EXECUTABLE = programa
