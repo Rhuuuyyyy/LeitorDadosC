@@ -27,5 +27,14 @@ void listar_categorias_unicas(Alimento** alimentos, int total); // Função para
 void listar_alimentos_por_categoria_alfa(Alimento** alimentos, int total); // Função para imprimir os alimentos por categoria em ordem alfabética...
 void listar_alimentos_por_categoria_energia(Alimento** alimentos, int total); // Função para imprimir os aliemntos por categoria em ordem decrescente de energia...
 
+// Protótipos para as opções de 'd' a 'i'
+void listar_n_melhores_umidade(Alimento** alimentos, int total);
+void listar_n_melhores_energia(Alimento** alimentos, int total);
+void listar_n_melhores_proteina(Alimento** alimentos, int total);
+void listar_n_melhores_carboidrato(Alimento** alimentos, int total);
+void listar_n_melhores_energia_proteina(Alimento** alimentos, int total);
+void listar_n_melhores_energia_carboidrato(Alimento** alimentos, int total);
+
+
 #endif // FUNCOES_USUARIO_H
 

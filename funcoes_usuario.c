@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "funcoes_usuario.h" 
 
 /*
@@ -82,15 +83,71 @@ int comparar_por_energia(const void* a, const void* b) {
     return alim_b->energia_kcal - alim_a->energia_kcal;
 }
 
+int comparar_por_umidade(const void* a, const void* b) {
+    Alimento* alim_a = *(Alimento**)a;
+    Alimento* alim_b = *(Alimento**)b;
+    if (alim_b->umidade > alim_a->umidade) return 1;
+    if (alim_b->umidade < alim_a->umidade) return -1;
+    return 0;
+}
+
+int comparar_por_proteina(const void* a, const void* b) {
+    Alimento* alim_a = *(Alimento**)a;
+    Alimento* alim_b = *(Alimento**)b;
+    if (alim_b->proteina > alim_a->proteina) return 1;
+    if (alim_b->proteina < alim_a->proteina) return -1;
+    return 0;
+}
+
+int comparar_por_carboidrato(const void* a, const void* b) {
+    Alimento* alim_a = *(Alimento**)a;
+    Alimento* alim_b = *(Alimento**)b;
+    if (alim_b->carboidrato > alim_a->carboidrato) return 1;
+    if (alim_b->carboidrato < alim_a->carboidrato) return -1;
+    return 0;
+}
+
+int comparar_por_energia_proteina(const void* a, const void* b) {
+    Alimento* alim_a = *(Alimento**)a;
+    Alimento* alim_b = *(Alimento**)b;
+    double relacao_a = (alim_a->proteina > 0) ? (double)alim_a->energia_kcal / alim_a->proteina : 0;
+    double relacao_b = (alim_b->proteina > 0) ? (double)alim_b->energia_kcal / alim_b->proteina : 0;
+    if (relacao_b > relacao_a) return 1;
+    if (relacao_b < relacao_a) return -1;
+    return 0;
+}
+
+int comparar_por_energia_carboidrato(const void* a, const void* b) {
+    Alimento* alim_a = *(Alimento**)a;
+    Alimento* alim_b = *(Alimento**)b;
+    double relacao_a = (alim_a->carboidrato > 0) ? (double)alim_a->energia_kcal / alim_a->carboidrato : 0;
+    double relacao_b = (alim_b->carboidrato > 0) ? (double)alim_b->energia_kcal / alim_b->carboidrato : 0;
+    if (relacao_b > relacao_a) return 1;
+    if (relacao_b < relacao_a) return -1;
+    return 0;
+}
+
+
 // Partição do Quick Sort: rearranja o array
 int particao(Alimento** arr, int baixo, int alto, int (*comparar)(const void*, const void*)) {
     Alimento* pivo = arr[alto];
     int i = (baixo - 1);
 
     for (int j = baixo; j <= alto - 1; j++) {
-        if (comparar(&arr[j], &pivo) < 0) {
-            i++;
-            trocar_ponteiros(&arr[i], &arr[j]);
+        // A lógica de comparação aqui depende do que a função 'comparar' retorna.
+        // Para ordem alfabética (ascendente), usamos '< 0'.
+        // Para as demais (decrescentes), usamos '> 0'.
+        // Como 'b' é a única ascendente, tratamos ela como um caso especial.
+        if (comparar == comparar_por_descricao) {
+            if (comparar(&arr[j], &arr[alto]) < 0) {
+                i++;
+                trocar_ponteiros(&arr[i], &arr[j]);
+            }
+        } else {
+            if (comparar(&arr[j], &arr[alto]) > 0) {
+                i++;
+                trocar_ponteiros(&arr[i], &arr[j]);
+            }
         }
     }
     trocar_ponteiros(&arr[i + 1], &arr[alto]);
@@ -110,15 +167,19 @@ void quick_sort(Alimento** arr, int baixo, int alto, int (*comparar)(const void*
 // FUNÇÃO PARA EXIBIR O MENU DE OPÇÕES DO USUÁRIO
 // ===================================================================================
 void exibir_menu() {
-
-
-
-
-    AQUI DEVE SER FEITO OS PRINTS DO MENU PARA O USUÁRIO...
-
-
-
-
+    printf("\n================ MENU DE OPCOES ================\n");
+    printf("a. Listar todas as categorias de alimentos.\n");
+    printf("b. Listar alimentos de uma categoria (ordem alfabetica).\n");
+    printf("c. Listar alimentos de uma categoria (ordem de energia).\n");
+    printf("d. Listar N alimentos com maior umidade (por categoria).\n");
+    printf("e. Listar N alimentos com maior energia (por categoria).\n");
+    printf("f. Listar N alimentos com mais proteina (por categoria).\n");
+    printf("g. Listar N alimentos com mais carboidrato (por categoria).\n");
+    printf("h. Listar N alimentos com maior relacao Energia/Proteina.\n");
+    printf("i. Listar N alimentos com maior relacao Energia/Carboidrato.\n");
+    printf("j. Encerrar o programa.\n");
+    printf("===============================================\n");
+    printf("Escolha uma opcao: ");
 }
 
 // ===================================================================================
@@ -140,21 +201,27 @@ void processar_opcao(char opcao, Alimento** alimentos, int total) {
             break;
             
         case 'd': case 'D':
+            listar_n_melhores_umidade(alimentos, total);
+            break;
         case 'e': case 'E':
+            listar_n_melhores_energia(alimentos, total);
+            break;
         case 'f': case 'F':
+            listar_n_melhores_proteina(alimentos, total);
+            break;
         case 'g': case 'G':
+            listar_n_melhores_carboidrato(alimentos, total);
+            break;
         case 'h': case 'H':
+            listar_n_melhores_energia_proteina(alimentos, total);
+            break;
         case 'i': case 'I':
-            // Para as outras opções, por enquanto, apenas exibimos uma mensagem.
-            printf("\nOpcao ainda nao implementada.\n");
+            listar_n_melhores_energia_carboidrato(alimentos, total);
             break;
         case 'j': case 'J':
-            // Se o usuário digitou 'j' ou 'J', apenas mostra uma mensagem de despedida.
-            // O programa vai terminar por causa da condição no loop 'do-while' da main.
             printf("\nEncerrando...\n");
             break;
         default:
-            // Se o usuário digitar qualquer outra letra, avisa que a opção é inválida.
             printf("\nOpcao invalida! Por favor, tente novamente.\n");
             break;
     }
@@ -195,7 +262,7 @@ void listar_categorias_unicas(Alimento** alimentos, int total) {
 }
 
 // ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'b')
+// FUNÇÃO PARA LISTAR OS ALIMENTOS POR CATEGORIA EM ORDEM ALFABÉTICA (OPÇÃO 'b')
 // ===================================================================================
 
 void listar_alimentos_por_categoria_alfa(Alimento** alimentos, int total) {
@@ -241,9 +308,8 @@ void listar_alimentos_por_categoria_alfa(Alimento** alimentos, int total) {
 }
 
 // ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'c')
+// FUNÇÃO PARA LISTAR OS ALIMENTOS POR CATEGORIA EM ORDEM DE ENERGIA (OPÇÃO 'c')
 // ===================================================================================
-
 void listar_alimentos_por_categoria_energia(Alimento** alimentos, int total) {
     char categoria_escolhida[100];
 
@@ -285,26 +351,93 @@ void listar_alimentos_por_categoria_energia(Alimento** alimentos, int total) {
 }
 
 // ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'd')
+// FUNÇÃO GENÉRICA PARA LISTAR OS 'N' MELHORES (OPÇÕES 'd' a 'i')
 // ===================================================================================
+void listar_n_melhores(Alimento** alimentos, int total, const char* titulo_opcao, const char* titulo_valor, const char* unidade, 
+                       int (*comparar)(const void*, const void*),
+                       double (*obter_valor)(Alimento*)) {
+
+    char categoria_escolhida[100];
+    int n;
+
+    // Passo 1: Interação com o usuário
+    printf("\n--- Listar N Alimentos com Maior %s ---\n", titulo_opcao);
+    listar_categorias_unicas(alimentos, total);
+    printf("\n> Digite o nome exato de uma das categorias acima: ");
+    scanf(" %[^\n]", categoria_escolhida);
+
+    printf("> Digite a quantidade de alimentos (N) a serem listados: ");
+    scanf("%d", &n);
+
+    // Passo 2: Filtragem dos alimentos
+    Alimento* alimentos_filtrados[100];
+    int total_filtrados = 0;
+    for (int i = 0; i < total; i++) {
+        if (strcmp(alimentos[i]->categoria, categoria_escolhida) == 0) {
+            alimentos_filtrados[total_filtrados++] = alimentos[i];
+        }
+    }
+
+    if (total_filtrados == 0) {
+        printf("\nNenhum alimento encontrado para a categoria \"%s\".\n", categoria_escolhida);
+        return;
+    }
+
+    // Passo 3: Ordenação com Quick Sort
+    quick_sort(alimentos_filtrados, 0, total_filtrados - 1, comparar);
+
+    // Passo 4: Exibir os resultados
+    printf("\n--- Top %d Alimentos em '%s' por Maior %s ---\n", n, categoria_escolhida, titulo_opcao);
+    
+    // Limita o 'n' ao número de alimentos encontrados, se necessário
+    if (n > total_filtrados) {
+        n = total_filtrados;
+    }
+
+    for (int i = 0; i < n; i++) {
+        printf("  %d. %s | %s: %.2f %s\n",
+               i + 1,
+               alimentos_filtrados[i]->descricao,
+               titulo_valor,
+               obter_valor(alimentos_filtrados[i]),
+               unidade);
+    }
+}
+
+// Funções para obter os valores específicos para o printf
+double obter_valor_umidade(Alimento* a) { return a->umidade; }
+double obter_valor_energia(Alimento* a) { return (double)a->energia_kcal; }
+double obter_valor_proteina(Alimento* a) { return a->proteina; }
+double obter_valor_carboidrato(Alimento* a) { return a->carboidrato; }
+double obter_valor_energia_proteina(Alimento* a) { return (a->proteina > 0) ? (double)a->energia_kcal / a->proteina : 0; }
+double obter_valor_energia_carboidrato(Alimento* a) { return (a->carboidrato > 0) ? (double)a->energia_kcal / a->carboidrato : 0; }
+
 
 // ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'e')
+// IMPLEMENTAÇÃO DAS OPÇÕES 'd' a 'i'
 // ===================================================================================
 
-// ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'f')
-// ===================================================================================
+void listar_n_melhores_umidade(Alimento** alimentos, int total) {
+    listar_n_melhores(alimentos, total, "Umidade", "Umidade", "%", comparar_por_umidade, obter_valor_umidade);
+}
 
-// ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'g')
-// ===================================================================================
+void listar_n_melhores_energia(Alimento** alimentos, int total) {
+    listar_n_melhores(alimentos, total, "Energia", "Energia", "Kcal", comparar_por_energia, obter_valor_energia);
+}
 
-// ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'h')
-// ===================================================================================
+void listar_n_melhores_proteina(Alimento** alimentos, int total) {
+    listar_n_melhores(alimentos, total, "Proteina", "Proteina", "g", comparar_por_proteina, obter_valor_proteina);
+}
 
-// ===================================================================================
-// FUNÇÃO PARA LISTAR AS CATEGORIAS (OPÇÃO 'i')
-// ===================================================================================
+void listar_n_melhores_carboidrato(Alimento** alimentos, int total) {
+    listar_n_melhores(alimentos, total, "Carboidrato", "Carboidrato", "g", comparar_por_carboidrato, obter_valor_carboidrato);
+}
+
+void listar_n_melhores_energia_proteina(Alimento** alimentos, int total) {
+    listar_n_melhores(alimentos, total, "Relacao Energia/Proteina", "Relacao E/P", "", comparar_por_energia_proteina, obter_valor_energia_proteina);
+}
+
+void listar_n_melhores_energia_carboidrato(Alimento** alimentos, int total) {
+    listar_n_melhores(alimentos, total, "Relacao Energia/Carboidrato", "Relacao E/C", "", comparar_por_energia_carboidrato, obter_valor_energia_carboidrato);
+}
 
