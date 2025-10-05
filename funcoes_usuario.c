@@ -341,7 +341,7 @@ void listar_alimentos_por_categoria_energia(Alimento** alimentos, int total) {
     quick_sort(alimentos_filtrados, 0, total_filtrados - 1, comparar_por_energia);
 
 
-    // Passo 4: Exibi os resultados
+    // Passo 4: Exibe os resultados
     printf("\n--- Alimentos na categoria '%s' (Ordem Decrescente de Energia) ---\n", categoria_escolhida);
     for (int i = 0; i < total_filtrados; i++) {
         printf("  - %s | Energia: %d Kcal\n",
